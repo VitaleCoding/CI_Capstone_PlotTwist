@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
+    form { max-width: 380px; display: grid; gap: 0.75rem; }
+    .row { display: grid; gap: 0.35rem; }
+    .error { color: #b00020; font-size: 0.9rem; }
+    .success { color: #0a7e07; font-size: 0.95rem; }
+    button[disabled] { opacity: 0.6; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <h1>Login</h1>
+
+  <form id="loginForm" novalidate>
+    <div class="row">
+      <label for="username">Username or email</label>
+      <input id="username" name="username" type="text" required autocomplete="username" />
+    </div>
+
+    <div class="row">
+      <label for="password">Password</label>
+      <div style="display:flex; gap:.5rem; align-items:center">
+        <input id="password" name="password" type="password" required minlength="8" autocomplete="current-password" />
+        <button type="button" id="togglePw" aria-pressed="false" aria-label="Show password">Show</button>
+      </div>
+    </div>
+
+    <label style="display:flex; gap:.5rem; align-items:center;">
+      <input type="checkbox" id="remember" name="remember" />
+      Keep me signed in (this device)
+    </label>
+
+    <button id="submitBtn" type="submit">Sign in</button>
+    <div id="msg" role="alert" aria-live="polite"></div>
+
+    <p style="margin-top:.5rem">
+      New here? <a href="register.html">Create an account</a>
+    </p>
+  </form>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('msg');
+    const submitBtn = document.getElementById('submitBtn');
+    const togglePw = document.getElementById('togglePw');
+    const pw = document.getElementById('password');
+
+    togglePw.addEventListener('click', () => {
+      const isText = pw.type === 'text';
+      pw.type = isText ? 'password' : 'text';
+      togglePw.textContent = isText ? 'Show' : 'Hide';
+      togglePw.setAttribute('aria-pressed', String(!isText));
+      pw.focus();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = '';
+      msg.className = '';
+      submitBtn.disabled = true;
+
+      const username = document.getElementById('username').value.trim();
+      const password = pw.value;
+
+      // Basic client-side checks (still must validate on server)
+      if (!username || !password || password.length < 8) {
+        msg.textContent = 'Please enter a valid username and a password (min 8 chars).';
+        msg.className = 'error';
+        submitBtn.disabled = false;
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          // Include cookies for session (important!)
+          credentials: 'include',
+          body: JSON.stringify({
+            username,
+            password,
+            remember: document.getElementById('remember').checked
+          })
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          msg.textContent = data.error || 'Login failed. Check your credentials.';
+          msg.className = 'error';
+          submitBtn.disabled = false;
+          return;
+        }
+
+        // Example: server returns basic profile
+        const user = await res.json();
+        msg.textContent = 'Success! Redirecting…';
+        msg.className = 'success';
+
+        // Store only non-sensitive info if needed
+        sessionStorage.setItem('displayName', user.displayName || user.username);
+
+        // Redirect to your main app page
+        window.location.href = 'indexSeparatePages.html';
+      } catch (err) {
+        console.error(err);
+        msg.textContent = 'Network error. Please try again.';
+        msg.className = 'error';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
