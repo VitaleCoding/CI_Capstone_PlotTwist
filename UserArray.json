@@ -4,34 +4,46 @@
     "firstName": "Sam",
     "username": "samvitale",
     "password": "P@ssword123",
-    "favorites": ["Action", "Sci-Fi", "Thriller"],
-    "movies": 
-    [
+    "favorites": [
+      "Action",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "movies": [
       {
         "title": "Placeholder Movie A",
         "image": "https://image.tmdb.org/t/p/w500/example_image_path_a.jpg",
         "description": "An action-packed thriller with intense fight scenes and stunning visuals.",
-        "actors": ["Actor One", "Actor Two", "Actor Three"],
+        "actors": [
+          "Actor One",
+          "Actor Two",
+          "Actor Three"
+        ],
         "ratings": 8.5,
         "genre": "Action"
       }
     ]
   },
-  
   {
     "lastName": "Douglas",
     "firstName": "Levison",
     "username": "trumpetguy345",
     "password": "P@ssword345",
-    "favorites": ["Horror", "Mystery"],
-    "movies":
-    [
+    "favorites": [
+      "Horror",
+      "Mystery"
+    ],
+    "movies": [
       {
         "title": "Placeholder Movie B",
         "image": "https://image.tmdb.org/t/p/w500/example_image_path_b.jpg",
         "description": "A chilling horror experience filled with mystery and suspense.",
-        "actors": ["Actor Four", "Actor Five", "Actor Six"],
-        "ratings": 8.0,
+        "actors": [
+          "Actor Four",
+          "Actor Five",
+          "Actor Six"
+        ],
+        "ratings": 8,
         "genre": "Horror"
       }
     ]
