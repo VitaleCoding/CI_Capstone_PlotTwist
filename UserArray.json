@@ -1,74 +1,39 @@
 [
   {
-    "userId": "user1",
+    "lastName": "Vitale",
+    "firstName": "Sam",
     "username": "samvitale",
-    "email": "sam@example.com",
-    "favoriteGenres": ["Action", "Sci-Fi", "Thriller"],
-    "likedMovies": [
+    "password": "P@ssword123",
+    "movies": 
+    [
       {
-        "tmdbId": 111111,
         "title": "Placeholder Movie A",
-        "rating": 8.5,
-        "review": "Really enjoyed the action sequences."
-      },
+        "image": "https://image.tmdb.org/t/p/w500/example_image_path_a.jpg",
+        "description": "An action-packed thriller with intense fight scenes and stunning visuals.",
+        "actors": ["Actor One", "Actor Two", "Actor Three"],
+        "ratings": 8.5,
+        "genre": "Action"
+      }
+    ],
+    "favorites": ["Action", "Sci-Fi", "Thriller"]
+  },
+  
+  {
+    "lastName": "Douglas",
+    "firstName": "Levison",
+    "username": "trumpetguy345",
+    "password": "P@ssword345",
+    "movies":
+    [
       {
-        "tmdbId": 111112,
         "title": "Placeholder Movie B",
-        "rating": 7.2,
-        "review": "Interesting concept, could have been better."
+        "image": "https://image.tmdb.org/t/p/w500/example_image_path_b.jpg",
+        "description": "A chilling horror experience filled with mystery and suspense.",
+        "actors": ["Actor Four", "Actor Five", "Actor Six"],
+        "ratings": 8.0,
+        "genre": "Horror"
       }
     ],
-    "recommendedMovies": [
-      {
-        "tmdbId": 111113,
-        "title": "Placeholder Recommendation A",
-        "rating": 8.9,
-        "genres": ["Action", "Thriller"]
-      }
-    ]
-  },
-  {
-    "userId": "user2",
-    "username": "moviebuff123",
-    "email": "buff@example.com",
-    "favoriteGenres": ["Horror", "Mystery"],
-    "likedMovies": [
-      {
-        "tmdbId": 222221,
-        "title": "Placeholder Movie C",
-        "rating": 8.0,
-        "review": "Scary and engaging, kept me hooked."
-      }
-    ],
-    "recommendedMovies": [
-      {
-        "tmdbId": 222222,
-        "title": "Placeholder Recommendation B",
-        "rating": 7.5,
-        "genres": ["Horror"]
-      }
-    ]
-  },
-  {
-    "userId": "user3",
-    "username": "cinephile007",
-    "email": "cinephile@example.com",
-    "favoriteGenres": ["Drama", "Romance"],
-    "likedMovies": [
-      {
-        "tmdbId": 333331,
-        "title": "Placeholder Movie D",
-        "rating": 9.0,
-        "review": "One of the best performances I've ever seen."
-      }
-    ],
-    "recommendedMovies": [
-      {
-        "tmdbId": 333332,
-        "title": "Placeholder Recommendation C",
-        "rating": 8.7,
-        "genres": ["Drama"]
-      }
-    ]
+    "favorites": ["Horror", "Mystery"]
   }
 ]
