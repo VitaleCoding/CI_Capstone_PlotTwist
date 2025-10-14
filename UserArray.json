@@ -3,6 +3,7 @@
     "lastName": "Vitale",
     "firstName": "Sam",
     "username": "samvitale",
+    "email": "realemail@gmail.com",
     "password": "P@ssword123",
     "favorites": [
       "Action",
@@ -28,6 +29,7 @@
     "lastName": "Douglas",
     "firstName": "Levison",
     "username": "trumpetguy345",
+    "email": "fakeemail@gmail.com",
     "password": "P@ssword345",
     "favorites": [
       "Horror",
