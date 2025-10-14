@@ -4,6 +4,7 @@
     "firstName": "Sam",
     "username": "samvitale",
     "password": "P@ssword123",
+    "favorites": ["Action", "Sci-Fi", "Thriller"],
     "movies": 
     [
       {
@@ -14,8 +15,7 @@
         "ratings": 8.5,
         "genre": "Action"
       }
-    ],
-    "favorites": ["Action", "Sci-Fi", "Thriller"]
+    ]
   },
   
   {
@@ -23,6 +23,7 @@
     "firstName": "Levison",
     "username": "trumpetguy345",
     "password": "P@ssword345",
+    "favorites": ["Horror", "Mystery"],
     "movies":
     [
       {
@@ -33,7 +34,6 @@
         "ratings": 8.0,
         "genre": "Horror"
       }
-    ],
-    "favorites": ["Horror", "Mystery"]
+    ]
   }
 ]
