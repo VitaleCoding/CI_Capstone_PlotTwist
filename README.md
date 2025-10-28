@@ -3,3 +3,6 @@ Most recent update to homepage.php adds the clickable logo and modal window for 
 Updated login2 to login.html, deleted redundant file
 
 Added login.php. Still a serious WIP but it is intended to send json data to jsonbin.io
+
+
+updated homepage.php to replace the movie search bar with a button that takes you to movie-search.php. added a registration feature. still needs work on connecting to JSONbin.io
