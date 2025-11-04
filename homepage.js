@@ -1,5 +1,4 @@
-// homepage.js
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const loginBtn = document.getElementById("openLogin");
   const createBtn = document.getElementById("openCreate");
   const modal = document.getElementById("accountModal");
@@ -8,9 +7,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const swapMode = document.getElementById("swapMode");
   const modalTitle = document.getElementById("modalTitle");
   const primaryAction = document.getElementById("primaryAction");
-  let mode = "login";
+  const msgDiv = document.getElementById("msgRegister");
 
-  // Open modal
+  const authButtons = document.getElementById("authButtons");
+  const userWelcome = document.getElementById("userWelcome");
+  const welcomeMsg = document.getElementById("welcomeMsg");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+
+  let mode = "login";
+  let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
+  renderLoggedInState();
+
+  function renderLoggedInState() {
+    if (currentUser) {
+      authButtons.style.display = "none";
+      userWelcome.style.display = "flex";
+      welcomeMsg.textContent = `Welcome, ${currentUser.firstName}!`;
+    } else {
+      authButtons.style.display = "flex";
+      userWelcome.style.display = "none";
+      welcomeMsg.textContent = "";
+    }
+  }
+
+  // Modal controls
   loginBtn.onclick = () => openModal("login");
   createBtn.onclick = () => openModal("create");
   closeModal.onclick = () => closeModalFn();
@@ -18,13 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function openModal(type) {
     mode = type;
     modal.setAttribute("aria-hidden", "false");
-    modal.style.display = "flex";
+    modal.classList.add("is-open");
     renderForm(type);
   }
 
   function closeModalFn() {
     modal.setAttribute("aria-hidden", "true");
-    modal.style.display = "none";
+    modal.classList.remove("is-open");
   }
 
   swapMode.onclick = () => {
@@ -37,24 +58,19 @@ document.addEventListener("DOMContentLoaded", () => {
     modalTitle.textContent = type === "login" ? "Login" : "Create Account";
     primaryAction.textContent = type === "login" ? "Login" : "Register";
     swapMode.textContent = type === "login" ? "Create Account" : "Back to Login";
+    msgDiv.textContent = "";
 
     if (type === "login") {
       fields.innerHTML = `
-        <label>Email</label>
-        <input id="loginEmail" type="email" required>
-        <label>Password</label>
-        <input id="loginPassword" type="password" required>
+        <div class="row"><label>Email</label><input id="loginEmail" type="email" required></div>
+        <div class="row"><label>Password</label><input id="loginPassword" type="password" required></div>
       `;
     } else {
       fields.innerHTML = `
-        <label>First Name</label>
-        <input id="firstName" type="text" required>
-        <label>Last Name</label>
-        <input id="lastName" type="text" required>
-        <label>Email</label>
-        <input id="email" type="email" required>
-        <label>Password</label>
-        <input id="password" type="password" required>
+        <div class="row"><label>First Name</label><input id="firstName" type="text" required></div>
+        <div class="row"><label>Last Name</label><input id="lastName" type="text" required></div>
+        <div class="row"><label>Email</label><input id="email" type="email" required></div>
+        <div class="row"><label>Password</label><input id="password" type="password" required></div>
       `;
     }
   }
@@ -70,10 +86,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (mode === "login") {
         const email = document.getElementById("loginEmail").value;
         const password = document.getElementById("loginPassword").value;
-
         const user = users.find(u => u.email === email && u.password === password);
 
-        alert(user ? `Welcome ${user.firstName}!` : "Invalid login.");
+        msgDiv.style.color = user ? "var(--success)" : "var(--danger)";
+        msgDiv.textContent = user ? `Welcome ${user.firstName}!` : "Invalid login.";
+
+        if (user) {
+          currentUser = user;
+          localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          renderLoggedInState();
+          setTimeout(closeModalFn, 500);
+        }
       } else {
         const newUser = {
           firstName: document.getElementById("firstName").value,
@@ -86,11 +109,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
         users.push(newUser);
         const ok = await putJSONData(users);
-        alert(ok ? "✅ Account created!" : "❌ Error saving account.");
+        msgDiv.style.color = ok ? "var(--success)" : "var(--danger)";
+        msgDiv.textContent = ok ? "✅ Account created!" : "❌ Error saving account.";
+
+        if (ok) {
+          currentUser = newUser;
+          localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          renderLoggedInState();
+          setTimeout(closeModalFn, 500);
+        }
       }
     } catch (err) {
       console.error(err);
-      alert("Error fetching or saving data.");
+      msgDiv.style.color = "var(--danger)";
+      msgDiv.textContent = "Error fetching or saving data.";
+    }
+  });
+
+  // Logout
+  logoutBtn?.addEventListener("click", () => {
+    currentUser = null;
+    localStorage.removeItem("currentUser");
+    renderLoggedInState();
+  });
+
+  // Delete account
+  deleteAccountBtn?.addEventListener("click", async () => {
+    if (!currentUser) return;
+
+    const confirmed = confirm("Are you sure you want to delete your account? This cannot be undone.");
+    if (!confirmed) return;
+
+    try {
+      const data = await getJSONData();
+      let users = Array.isArray(data) ? data : [];
+
+      users = users.filter(u => u.email !== currentUser.email);
+      const ok = await putJSONData(users);
+
+      if (ok) {
+        alert("Your account has been deleted.");
+        currentUser = null;
+        localStorage.removeItem("currentUser");
+        renderLoggedInState();
+      } else {
+        alert("Failed to delete account.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting account: " + err);
     }
   });
 });
