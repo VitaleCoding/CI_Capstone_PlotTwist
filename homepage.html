@@ -1,34 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Homepage</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlotTwist — Home</title>
+<style>
+:root {
+  --bg: #0b0f14; --card: #0f1720; --card-2: #111927; --text: #e6edf3; --muted: #a7b0ba;
+  --primary: #ff5a1f; --primary-2: #ffd166; --danger: #ef4444; --success: #22c55e; --ring: rgba(124, 58, 237, 0.45);
+}
+* { box-sizing: border-box; }
+html, body { height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; color: var(--text);
+  background:
+    radial-gradient(1200px 800px at 80% -10%, rgba(124,58,237,.2), transparent),
+    radial-gradient(800px 600px at -10% 80%, rgba(23, 162, 184, .18), transparent),
+    linear-gradient(180deg, #0a0f14 0%, #0b0f14 40%, #06090d 100%);
+}
+header { display:flex; justify-content:space-between; align-items:center; padding:1.2rem 2rem; background: rgba(17,25,39,.5); border-bottom:1px solid rgba(255,255,255,.08); backdrop-filter: blur(8px); }
+header h1 { font-size:1.4rem; margin:0; }
+header h1 a { color:inherit; text-decoration:none; }
+header button { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color:#0b0f14; border:none; padding:.7rem 1.4rem; font-weight:700; border-radius:12px; cursor:pointer; transition: transform .05s ease, filter .15s ease; }
+header button:active { transform: translateY(1px); }
+
+main { text-align:center; padding:4rem 1rem; }
+main h2 { font-size:2rem; margin-bottom:.75rem; }
+main p { color: var(--muted); font-size:1.1rem; max-width:600px; margin:0 auto; }
+.btn { padding:.85rem 1rem; border-radius:14px; border:1px solid rgba(255,255,255,.08); background: linear-gradient(135deg, var(--primary), var(--primary-2)); color:#0b0f14; font-weight:700; cursor:pointer; margin-top:2rem; }
+
+.modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); justify-content:center; align-items:center; z-index:999; padding:1rem; }
+.modal.is-open { display:flex; }
+.modal-content { background: linear-gradient(180deg, var(--card), var(--card-2)); border:1px solid rgba(255,255,255,.06); border-radius:20px; width:95%; max-width:400px; padding:1.25rem; position:relative; }
+.close { position:absolute; top:10px; right:16px; font-size:1.6rem; color:var(--muted); cursor:pointer; }
+
+#modalFields .row { display:grid; gap:.4rem; margin-bottom:.8rem; }
+#modalFields label { font-weight:600; font-size:.95rem; }
+#modalFields input { width:100%; padding:.9rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,.08); background: rgba(17,25,39,.6); color: var(--text); }
+
+#msgLogin, #msgRegister { text-align:center; margin-top:.5rem; font-weight:700; }
+#msgLogin { color: var(--success); }
+#msgRegister { color: var(--success); }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Welcome to My Movie Site</h1>
-    <div class="buttons">
-      <button id="openLogin">Login</button>
-      <button id="openCreate">Create Account</button>
-    </div>
-  </header>
-
-  <!-- Modal for Login / Register -->
-  <div id="accountModal" class="modal" aria-hidden="true" style="display:none;">
-    <div class="modal-content">
-      <span id="closeModal" class="close">&times;</span>
-      <h2 id="modalTitle">Login</h2>
-      <form id="modalForm">
-        <div id="modalFields"></div>
-        <button id="primaryAction" type="submit">Login</button>
-      </form>
-      <button id="swapMode" type="button">Create Account</button>
-    </div>
+<header>
+  <h1><a href="#">🎬 PlotTwist</a></h1>
+  <div class="buttons" id="authButtons">
+    <button id="openLogin">Sign In</button>
+    <button id="openCreate">Register</button>
   </div>
+  <div id="userWelcome">
+  <span id="welcomeMsg"></span>
+  <button id="logoutBtn">Logout</button>
+  <button id="deleteAccountBtn" style="background:#ef4444;">Delete Account</button>
+</div>
+</header>
 
-  <script src="getJSONData.js"></script>
-  <script src="putJSONData.js"></script>
-  <script src="homepage.js"></script>
+
+<main>
+  <h2>Welcome to PlotTwist</h2>
+  <p>Discover, track, and review your favorite films and shows.</p>
+  <button class="btn" onclick="window.location='movie-search.php'">Go to Movie Search</button>
+</main>
+
+<!-- Dynamic Login/Register Modal -->
+<div id="accountModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h2 id="modalTitle" style="text-align:center;">Login</h2>
+    <form id="modalForm">
+      <div id="modalFields"></div>
+      <button id="primaryAction" type="submit" class="btn">Login</button>
+    </form>
+    <button id="swapMode" type="button" class="btn" style="margin-top:1rem;">Create Account</button>
+    <div id="msgRegister" role="alert" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="getJSONData.js"></script>
+<script src="putJSONData.js"></script>
+<script src="homepage.js"></script>
 </body>
 </html>
