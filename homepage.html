@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Homepage</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Welcome to My Movie Site</h1>
+    <div class="buttons">
+      <button id="openLogin">Login</button>
+      <button id="openCreate">Create Account</button>
+    </div>
+  </header>
+
+  <!-- Modal for Login / Register -->
+  <div id="accountModal" class="modal" aria-hidden="true" style="display:none;">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h2 id="modalTitle">Login</h2>
+      <form id="modalForm">
+        <div id="modalFields"></div>
+        <button id="primaryAction" type="submit">Login</button>
+      </form>
+      <button id="swapMode" type="button">Create Account</button>
+    </div>
+  </div>
+
+  <script src="getJSONData.js"></script>
+  <script src="putJSONData.js"></script>
+  <script src="homepage.js"></script>
+</body>
+</html>
