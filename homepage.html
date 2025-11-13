@@ -39,6 +39,10 @@ main p { color: var(--muted); font-size:1.1rem; max-width:600px; margin:0 auto; 
 #msgLogin, #msgRegister { text-align:center; margin-top:.5rem; font-weight:700; }
 #msgLogin { color: var(--success); }
 #msgRegister { color: var(--success); }
+header h1 a {
+  color: var(--primary);
+}
+
 </style>
 </head>
 <body>
@@ -50,6 +54,7 @@ main p { color: var(--muted); font-size:1.1rem; max-width:600px; margin:0 auto; 
   </div>
   <div id="userWelcome">
   <span id="welcomeMsg"></span>
+  <button id="profileBtn" onclick="window.location.href='profile.php'">Profile</button>
   <button id="logoutBtn">Logout</button>
   <button id="deleteAccountBtn" style="background:#ef4444;">Delete Account</button>
 </div>
