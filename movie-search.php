@@ -152,6 +152,15 @@ button[type="submit"]:active { transform: translateY(1px); }
   cursor:pointer;
   transition: background .2s ease;
 }
+.btn-add {
+  background: #22c55e !important; /* green */
+  color: #0b0f14 !important;
+}
+
+.btn-remove {
+  background: #ef4444 !important; /* red */
+  color: white !important;
+}
 .btn:hover {
   background: linear-gradient(135deg, var(--primary-2), var(--primary));
   color:#0b0f14;
@@ -266,10 +275,17 @@ button[type="submit"]:active { transform: translateY(1px); }
           <h4>Trailer</h4>
           <a id="modalTrailer" target="_blank" rel="noopener" class="video-link">Open YouTube trailer</a>
         </div>
+		<div class="modal-section">
+		  <h4>Library</h4>
+          <button id="modalFavoriteBtn" class="btn">Add to Library</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<script src="getJSONData.js"></script>
+<script src="putJSONData.js"></script>
 
 <script>
 const TMDB_API_KEY = <?= json_encode($apiKey) ?>;
@@ -282,6 +298,82 @@ const modalGenres = document.getElementById('modalGenres');
 const modalCast = document.getElementById('modalCast');
 const modalTrailer = document.getElementById('modalTrailer');
 const modalCloseBtn = document.querySelector('.modal-close');
+const modalFavoriteBtn = document.getElementById('modalFavoriteBtn');
+
+// --- current user + favorites helpers ---
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem('currentUser') || 'null');
+  } catch (e) {
+    return null;
+  }
+}
+
+function setCurrentUser(user) {
+  localStorage.setItem('currentUser', JSON.stringify(user));
+}
+
+function isFavorite(movieId) {
+  const user = getCurrentUser();
+  if (!user || !Array.isArray(user.favorites)) return false;
+  return user.favorites.some(f => String(f.id) === String(movieId));
+}
+
+function updateFavoriteButton(movieId) {
+  if (!modalFavoriteBtn) return;
+
+  if (isFavorite(movieId)) {
+    modalFavoriteBtn.textContent = 'Remove from Library';
+    modalFavoriteBtn.classList.remove('btn-add');
+    modalFavoriteBtn.classList.add('btn-remove');
+  } else {
+    modalFavoriteBtn.textContent = 'Add to Library';
+    modalFavoriteBtn.classList.remove('btn-remove');
+    modalFavoriteBtn.classList.add('btn-add');
+  }
+}
+
+async function syncFavorite(action, movieObj) {
+  const user = getCurrentUser();
+  if (!user) {
+    alert('Please log in on the homepage to use your library.');
+    return false;
+  }
+
+  // get all users from JSONBin
+  let users = await getJSONData();
+  if (!Array.isArray(users)) users = [];
+
+  const idx = users.findIndex(u => u.email === user.email);
+  if (idx === -1) {
+    alert('User not found in database.');
+    return false;
+  }
+
+  let favs = Array.isArray(users[idx].favorites) ? users[idx].favorites : [];
+
+  if (action === 'add') {
+    if (!favs.some(f => String(f.id) === String(movieObj.id))) {
+      favs.push(movieObj);
+    }
+  } else if (action === 'remove') {
+    favs = favs.filter(f => String(f.id) !== String(movieObj.id));
+  }
+
+  users[idx].favorites = favs;
+
+  const ok = await putJSONData(users);
+  if (ok) {
+    // keep localStorage in sync
+    user.favorites = favs;
+    setCurrentUser(user);
+  } else {
+    alert('Failed to update library.');
+  }
+
+  return ok;
+}
+
 
 function openModal() { modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); }
 function closeModal() { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
@@ -300,38 +392,68 @@ function setGenres(genres){ modalGenres.innerHTML=''; if(!genres||!genres.length
 function setCast(credits){ if(!credits||!credits.cast){modalCast.textContent='N/A'; return;} const names=credits.cast.slice(0,5).map(c=>c.name).filter(Boolean); modalCast.textContent=names.length?names.join(', '):'N/A'; }
 function setTrailer(videos){ if(!videos||!videos.results||!videos.results.length){modalTrailer.style.display='none'; return;} const trailer=videos.results.find(v=>v.site==='YouTube'&&v.type==='Trailer')||videos.results.find(v=>v.site==='YouTube'); if(trailer&&trailer.key){ modalTrailer.href=`https://www.youtube.com/watch?v=${trailer.key}`; modalTrailer.style.display='inline-block'; } else { modalTrailer.style.display='none'; } }
 
-async function showDetails(id,fallbackTitle='Movie Details',fallbackPoster=null){
-  modalTitle.textContent=fallbackTitle;
-  modalOverview.textContent='Loading…';
-  modalFacts.textContent='';
-  modalGenres.innerHTML='';
-  modalCast.textContent='Loading…';
-  modalTrailer.style.display='none';
-  modalPoster.src=fallbackPoster||'';
-  modalPoster.alt=fallbackTitle+' poster';
+async function showDetails(id, fallbackTitle='Movie Details', fallbackPoster=null){
+  modalTitle.textContent = fallbackTitle;
+  modalOverview.textContent = 'Loading…';
+  modalFacts.textContent = '';
+  modalGenres.innerHTML = '';
+  modalCast.textContent = 'Loading…';
+  modalTrailer.style.display = 'none';
+  modalPoster.src = fallbackPoster || '';
+  modalPoster.alt = fallbackTitle + ' poster';
+
+  // Set initial button state based on current favorites
+  updateFavoriteButton(id);
+
   openModal();
-  try{
-    const data=await fetchMovieDetails(id);
-    const title=data.title||data.original_title||fallbackTitle;
-    const posterPath=data.poster_path?`https://image.tmdb.org/t/p/w300${data.poster_path}`:fallbackPoster;
-    modalTitle.textContent=title;
-    if(posterPath){modalPoster.src=posterPath; modalPoster.alt=title+' poster';}
-    modalOverview.textContent=data.overview||'No description available.';
-    const year=(data.release_date||'').slice(0,4)||'N/A';
-    const runtime=formatMinutes(data.runtime);
-    const rating=(typeof data.vote_average==='number')?`${data.vote_average.toFixed(1)}/10`:'N/A';
-    modalFacts.textContent=`Year: ${year} • Runtime: ${runtime} • Rating: ${rating}`;
+  try {
+    const data = await fetchMovieDetails(id);
+    const title = data.title || data.original_title || fallbackTitle;
+    const posterPath = data.poster_path ? `https://image.tmdb.org/t/p/w300${data.poster_path}` : fallbackPoster;
+    modalTitle.textContent = title;
+    if (posterPath) {
+      modalPoster.src = posterPath;
+      modalPoster.alt = title + ' poster';
+    }
+    modalOverview.textContent = data.overview || 'No description available.';
+    const year = (data.release_date || '').slice(0,4) || 'N/A';
+    const runtime = formatMinutes(data.runtime);
+    const ratingVal = (typeof data.vote_average === 'number') ? data.vote_average.toFixed(1) : null;
+    const ratingLabel = ratingVal ? `${ratingVal}/10` : 'N/A';
+    modalFacts.textContent = `Year: ${year} • Runtime: ${runtime} • Rating: ${ratingLabel}`;
     setGenres(data.genres);
     setCast(data.credits);
     setTrailer(data.videos);
-  }catch(e){
-    modalOverview.textContent='Sorry, we could not load more details right now.';
-    modalFacts.textContent='';
-    modalGenres.innerHTML='';
-    modalCast.textContent='N/A';
-    modalTrailer.style.display='none';
+
+    // Prepare movie object to store in favorites
+    const movieObj = {
+      id: id,
+      title: title,
+      year: year,
+      poster: posterPath || null,
+      rating: ratingVal ? Number(ratingVal) : null
+    };
+
+    if (modalFavoriteBtn) {
+      // reset handler each time the modal opens
+      modalFavoriteBtn.onclick = async () => {
+        const inLib = isFavorite(id);
+        const action = inLib ? 'remove' : 'add';
+        const ok = await syncFavorite(action, movieObj);
+        if (ok) {
+          updateFavoriteButton(id);
+        }
+      };
+    }
+  } catch (e) {
+    modalOverview.textContent = 'Sorry, we could not load more details right now.';
+    modalFacts.textContent = '';
+    modalGenres.innerHTML = '';
+    modalCast.textContent = 'N/A';
+    modalTrailer.style.display = 'none';
   }
 }
+
 
 document.addEventListener('click',(e)=>{
   const btn=e.target.closest('.js-details');
