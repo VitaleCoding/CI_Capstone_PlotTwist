@@ -132,6 +132,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     localStorage.removeItem("currentUser");
     renderLoggedInState();
   });
+  
+  
 
   // Delete account
   deleteAccountBtn?.addEventListener("click", async () => {
@@ -160,4 +162,5 @@ document.addEventListener("DOMContentLoaded", async () => {
       alert("Error deleting account: " + err);
     }
   });
+  
 });
