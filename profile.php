@@ -24,7 +24,7 @@ body {
   min-height: 100vh;
 }
 
-/* Header (logo only, clickable back to homepage) */
+/* Header (logo only, clickable back to homepage.php) */
 header {
   display:flex; align-items:center; gap:12px;
   background: rgba(17,25,39,.5);
@@ -107,6 +107,7 @@ header h1 {
   font-weight:700;
   cursor:pointer;
 }
+
 </style>
 </head>
 <body>
@@ -144,7 +145,6 @@ header h1 {
 </main>
 
 <script>
-// Load current user from localStorage (set by homepage.js after login)
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
 function setText(id, value) {
@@ -152,7 +152,7 @@ function setText(id, value) {
   if (el) el.textContent = value ?? '—';
 }
 
-(function renderProfile(){
+function renderProfile(){
   if (!currentUser) {
     setText('pfFirstName', '—');
     setText('pfLastName',  '—');
@@ -165,9 +165,57 @@ function setText(id, value) {
   setText('pfLastName',  currentUser.lastName  || '—');
   setText('pfEmail',     currentUser.email     || '—');
   setText('pfStatus',    'Active');
+}
 
-  // Render favorites if you later store them as currentUser.favorites = [ {id, title, poster, ...}, ... ]
-})();
+function renderFavorites() {
+  const favContainer = document.getElementById('favorites');
+  if (!favContainer) return;
+
+  const favs = (currentUser && Array.isArray(currentUser.favorites)) ? currentUser.favorites : [];
+
+  favContainer.innerHTML = '';
+
+  if (!favs.length) {
+    const empty = document.createElement('div');
+    empty.className = 'fav-empty';
+    empty.textContent = 'Your favorites library is empty. Add movies from the search page.';
+    favContainer.appendChild(empty);
+    return;
+  }
+
+  favs.forEach(f => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.padding = '.8rem';
+
+    if (f.poster) {
+      const img = document.createElement('img');
+      img.src = f.poster;
+      img.alt = (f.title || 'Poster') + ' poster';
+      img.style.width = '100%';
+      img.style.borderRadius = '10px';
+      img.style.marginBottom = '.5rem';
+      card.appendChild(img);
+    }
+
+    const title = document.createElement('div');
+    title.style.fontWeight = '700';
+    title.style.marginBottom = '.3rem';
+    title.textContent = f.title || 'Untitled';
+
+    const meta = document.createElement('div');
+    meta.style.fontSize = '.9rem';
+    meta.style.color = 'var(--muted)';
+    meta.textContent = `Year: ${f.year || 'N/A'}${f.rating ? ` • Rating: ${f.rating}/10` : ''}`;
+
+    card.appendChild(title);
+    card.appendChild(meta);
+    favContainer.appendChild(card);
+  });
+}
+
+renderProfile();
+renderFavorites();
 </script>
 
 </body>
