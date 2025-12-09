@@ -1,3 +1,5 @@
+12/9/25 - movie-search.php is updated so that the "more info" button shows a link to a TMDB page for the respective movie, which will show the user where the movie is available to stream.
+
 12/7/25 - Profile.php is updated so that the movies that are in the user's favorites have a "more info" button which opens up the same modal window as movie-search and allows the user to remove the movie from their library right there.
 
 11/17/25 - All updated files should now allow the user to search for a movie, add/remove that movie from a personal library that is viewable on their profile page.
